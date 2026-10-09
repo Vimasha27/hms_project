@@ -1,0 +1,534 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+  RECEPTIONIST
+  LAB_STAFF
+  PHARMACIST
+  ACCOUNTANT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_CONSULTATION
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PrescriptionStatus {
+  PENDING
+  DISPENSED
+  PARTIAL
+  CANCELLED
+}
+
+enum LabStatus {
+  REQUESTED
+  SAMPLE_COLLECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum AdmissionStatus {
+  ADMITTED
+  DISCHARGED
+  TRANSFERRED
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  ONLINE
+  INSURANCE
+}
+
+enum ServiceType {
+  CONSULTATION
+  LAB_TEST
+  PHARMACY
+  ROOM_CHARGE
+  PROCEDURE
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  ON_LEAVE
+  HALF_DAY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// --------------------------------------------------------------------------
+// Core User & Auth
+// --------------------------------------------------------------------------
+
+model User {
+  id            String     @id @default(uuid())
+  username      String     @unique
+  email         String     @unique
+  passwordHash  String     @map("password_hash")
+  role          Role       @default(RECEPTIONIST)
+  isActive      Boolean    @default(true) @map("is_active")
+  lastLogin     DateTime?  @map("last_login")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  employee      Employee?
+  doctor        Doctor?
+  auditLogs     AuditLog[]
+  performedLabs LabResult[] @relation("LabPerformedBy")
+  verifiedLabs  LabResult[] @relation("LabVerifiedBy")
+  receivedPayments Payment[]
+
+  @@map("users")
+}
+
+model Department {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  doctors     Doctor[]
+  employees   Employee[]
+
+  @@map("departments")
+}
+
+model Employee {
+  id             String         @id @default(uuid())
+  userId         String?        @unique @map("user_id")
+  user           User?          @relation(fields: [userId], references: [id])
+  employeeCode   String         @unique @map("employee_code")
+  firstName      String         @map("first_name")
+  lastName       String         @map("last_name")
+  designation    String
+  departmentId   String?        @map("department_id")
+  department     Department?    @relation(fields: [departmentId], references: [id])
+  phone          String
+  email          String?
+  joiningDate    DateTime       @default(now()) @map("joining_date")
+  salary         Decimal?       @db.Decimal(10, 2)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  attendance     Attendance[]
+  leaveRequests  LeaveRequest[]
+
+  @@map("employees")
+}
+
+model Doctor {
+  id               String           @id @default(uuid())
+  userId           String           @unique @map("user_id")
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId     String           @map("department_id")
+  department       Department       @relation(fields: [departmentId], references: [id])
+  specialization   String
+  licenseNumber    String           @unique @map("license_number")
+  consultationFee  Decimal          @default(0.00) @map("consultation_fee") @db.Decimal(10, 2)
+  isAvailable      Boolean          @default(true) @map("is_available")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  schedules        DoctorSchedule[]
+  appointments     Appointment[]
+  medicalRecords   MedicalRecord[]
+  prescriptions    Prescription[]
+  labRequests      LabRequest[]
+  admissions       Admission[]
+
+  @@map("doctors")
+}
+
+model DoctorSchedule {
+  id                  String   @id @default(uuid())
+  doctorId            String   @map("doctor_id")
+  doctor              Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  dayOfWeek           Int      @map("day_of_week") // 0 = Sunday, 1 = Monday, etc.
+  startTime           String   @map("start_time")  // HH:mm
+  endTime             String   @map("end_time")    // HH:mm
+  slotDurationMinutes Int      @default(15) @map("slot_duration_minutes")
+
+  @@map("doctor_schedules")
+}
+
+// --------------------------------------------------------------------------
+// Patient & Appointments
+// --------------------------------------------------------------------------
+
+model Patient {
+  id                     String           @id @default(uuid())
+  patientCode            String           @unique @map("patient_code")
+  firstName              String           @map("first_name")
+  lastName               String           @map("last_name")
+  dob                    DateTime
+  gender                 Gender
+  bloodGroup             String?          @map("blood_group")
+  contactNumber          String           @map("contact_number")
+  email                  String?
+  address                String?
+  emergencyContactName   String?          @map("emergency_contact_name")
+  emergencyContactPhone  String?          @map("emergency_contact_phone")
+  allergies              String?
+  medicalHistorySummary  String?          @map("medical_history_summary")
+  createdAt              DateTime         @default(now()) @map("created_at")
+  updatedAt              DateTime         @updatedAt @map("updated_at")
+
+  appointments           Appointment[]
+  medicalRecords         MedicalRecord[]
+  prescriptions          Prescription[]
+  labRequests            LabRequest[]
+  admissions             Admission[]
+  invoices               Invoice[]
+
+  @@map("patients")
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  patientId       String            @map("patient_id")
+  patient         Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId        String            @map("doctor_id")
+  doctor          Doctor            @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointmentDate DateTime          @map("appointment_date")
+  timeSlot        String            @map("time_slot") // HH:mm
+  status          AppointmentStatus @default(SCHEDULED)
+  reason          String?
+  notes           String?
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  medicalRecord   MedicalRecord?
+
+  @@map("appointments")
+}
+
+// --------------------------------------------------------------------------
+// Electronic Medical Records (EMR)
+// --------------------------------------------------------------------------
+
+model MedicalRecord {
+  id            String         @id @default(uuid())
+  patientId     String         @map("patient_id")
+  patient       Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId      String         @map("doctor_id")
+  doctor        Doctor         @relation(fields: [doctorId], references: [id])
+  appointmentId String?        @unique @map("appointment_id")
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id])
+  symptoms      String?
+  diagnosis     String
+  vitals        Json?          // { bp: "120/80", pulse: 72, temp: 98.6, spo2: 99, weight: 70 }
+  treatmentPlan String?        @map("treatment_plan")
+  visitDate     DateTime       @default(now()) @map("visit_date")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  prescriptions Prescription[]
+
+  @@map("medical_records")
+}
+
+model Prescription {
+  id              String             @id @default(uuid())
+  medicalRecordId String?            @map("medical_record_id")
+  medicalRecord   MedicalRecord?     @relation(fields: [medicalRecordId], references: [id])
+  patientId       String             @map("patient_id")
+  patient         Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId        String             @map("doctor_id")
+  doctor          Doctor             @relation(fields: [doctorId], references: [id])
+  status          PrescriptionStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  items           PrescriptionItem[]
+
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id                String       @id @default(uuid())
+  prescriptionId    String       @map("prescription_id")
+  prescription      Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicineId        String       @map("medicine_id")
+  medicine          Medicine     @relation(fields: [medicineId], references: [id])
+  dosage            String       // e.g. "500mg"
+  frequency         String       // e.g. "1-0-1"
+  durationDays      Int          @map("duration_days")
+  instructions      String?      // e.g. "After meals"
+  quantityRequired  Int          @map("quantity_required")
+  quantityDispensed Int          @default(0) @map("quantity_dispensed")
+
+  @@map("prescription_items")
+}
+
+// --------------------------------------------------------------------------
+// Pharmacy & Inventory
+// --------------------------------------------------------------------------
+
+model Medicine {
+  id                String            @id @default(uuid())
+  name              String
+  genericName       String?           @map("generic_name")
+  category          String
+  unit              String            // Tablets, Syrup, Injection, Cream
+  unitPrice         Decimal           @map("unit_price") @db.Decimal(10, 2)
+  reorderLevel      Int               @default(20) @map("reorder_level")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  batches           InventoryBatch[]
+  prescriptionItems PrescriptionItem[]
+
+  @@map("medicines")
+}
+
+model InventoryBatch {
+  id              String    @id @default(uuid())
+  medicineId      String    @map("medicine_id")
+  medicine        Medicine  @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  batchNumber     String    @map("batch_number")
+  expiryDate      DateTime  @map("expiry_date")
+  quantityInStock Int       @map("quantity_in_stock")
+  purchasePrice   Decimal   @map("purchase_price") @db.Decimal(10, 2)
+  sellingPrice    Decimal   @map("selling_price") @db.Decimal(10, 2)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("inventory_batches")
+}
+
+// --------------------------------------------------------------------------
+// Laboratory
+// --------------------------------------------------------------------------
+
+model LabTest {
+  id            String       @id @default(uuid())
+  testName      String       @map("test_name")
+  category      String
+  cost          Decimal      @db.Decimal(10, 2)
+  standardRange String?      @map("standard_range")
+  sampleType    String?      @map("sample_type") // Blood, Urine, Saliva
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  requests      LabRequest[]
+
+  @@map("lab_tests")
+}
+
+model LabRequest {
+  id        String     @id @default(uuid())
+  patientId String     @map("patient_id")
+  patient   Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId  String     @map("doctor_id")
+  doctor    Doctor     @relation(fields: [doctorId], references: [id])
+  testId    String     @map("test_id")
+  test      LabTest    @relation(fields: [testId], references: [id])
+  status    LabStatus  @default(REQUESTED)
+  urgency   String     @default("ROUTINE") // ROUTINE, URGENT
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  result    LabResult?
+
+  @@map("lab_requests")
+}
+
+model LabResult {
+  id             String      @id @default(uuid())
+  requestId      String      @unique @map("request_id")
+  request        LabRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  resultValue    String      @map("result_value")
+  normalRange    String?     @map("normal_range")
+  interpretation String?
+  performedById  String?     @map("performed_by_id")
+  performedBy    User?       @relation("LabPerformedBy", fields: [performedById], references: [id])
+  verifiedById   String?     @map("verified_by_id")
+  verifiedBy     User?       @relation("LabVerifiedBy", fields: [verifiedById], references: [id])
+  resultDate     DateTime    @default(now()) @map("result_date")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  @@map("lab_results")
+}
+
+// --------------------------------------------------------------------------
+// Inpatient & Ward Management
+// --------------------------------------------------------------------------
+
+model Ward {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  type      String   // General, ICU, Maternity, Pediatric
+  dailyRate Decimal  @map("daily_rate") @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  beds      Bed[]
+
+  @@map("wards")
+}
+
+model Bed {
+  id         String      @id @default(uuid())
+  wardId     String      @map("ward_id")
+  ward       Ward        @relation(fields: [wardId], references: [id], onDelete: Cascade)
+  bedNumber  String      @map("bed_number")
+  isOccupied Boolean     @default(false) @map("is_occupied")
+
+  admissions Admission[]
+
+  @@unique([wardId, bedNumber])
+  @@map("beds")
+}
+
+model Admission {
+  id               String          @id @default(uuid())
+  patientId        String          @map("patient_id")
+  patient          Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId         String          @map("doctor_id")
+  doctor           Doctor          @relation(fields: [doctorId], references: [id])
+  bedId            String          @map("bed_id")
+  bed              Bed             @relation(fields: [bedId], references: [id])
+  admissionDate    DateTime        @default(now()) @map("admission_date")
+  dischargeDate    DateTime?       @map("discharge_date")
+  admissionReason  String          @map("admission_reason")
+  dischargeSummary String?         @map("discharge_summary")
+  status           AdmissionStatus @default(ADMITTED)
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  @@map("admissions")
+}
+
+// --------------------------------------------------------------------------
+// Billing, Invoices & Payments
+// --------------------------------------------------------------------------
+
+model Invoice {
+  id             String        @id @default(uuid())
+  invoiceNumber  String        @unique @map("invoice_number")
+  patientId      String        @map("patient_id")
+  patient        Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  totalAmount    Decimal       @map("total_amount") @db.Decimal(10, 2)
+  discountAmount Decimal       @default(0.00) @map("discount_amount") @db.Decimal(10, 2)
+  taxAmount      Decimal       @default(0.00) @map("tax_amount") @db.Decimal(10, 2)
+  netAmount      Decimal       @map("net_amount") @db.Decimal(10, 2)
+  status         InvoiceStatus @default(UNPAID)
+  dueDate        DateTime?     @map("due_date")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  items          InvoiceItem[]
+  payments       Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id              String      @id @default(uuid())
+  invoiceId       String      @map("invoice_id")
+  invoice         Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  serviceType     ServiceType @map("service_type")
+  itemDescription String      @map("item_description")
+  quantity        Int         @default(1)
+  unitPrice       Decimal     @map("unit_price") @db.Decimal(10, 2)
+  totalPrice      Decimal     @map("total_price") @db.Decimal(10, 2)
+
+  @@map("invoice_items")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  invoiceId      String        @map("invoice_id")
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amountPaid     Decimal       @map("amount_paid") @db.Decimal(10, 2)
+  paymentMethod  PaymentMethod @map("payment_method")
+  transactionRef String?       @map("transaction_ref")
+  paymentDate    DateTime      @default(now()) @map("payment_date")
+  receivedById   String?       @map("received_by_id")
+  receivedBy     User?         @relation(fields: [receivedById], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  @@map("payments")
+}
+
+// --------------------------------------------------------------------------
+// HR, Attendance & Leaves
+// --------------------------------------------------------------------------
+
+model Attendance {
+  id         String           @id @default(uuid())
+  employeeId String           @map("employee_id")
+  employee   Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date       DateTime         @db.Date
+  checkIn    DateTime?        @map("check_in")
+  checkOut   DateTime?        @map("check_out")
+  status     AttendanceStatus @default(PRESENT)
+
+  @@unique([employeeId, date])
+  @@map("attendance")
+}
+
+model LeaveRequest {
+  id         String      @id @default(uuid())
+  employeeId String      @map("employee_id")
+  employee   Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  startDate  DateTime    @map("start_date") @db.Date
+  endDate    DateTime    @map("end_date") @db.Date
+  leaveType  String      @map("leave_type") // Sick, Casual, Annual
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@map("leave_requests")
+}
+
+// --------------------------------------------------------------------------
+// Security & Audit Logs
+// --------------------------------------------------------------------------
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, EXPORT
+  entityName String   @map("entity_name")
+  entityId   String?  @map("entity_id")
+  details    Json?
+  ipAddress  String?  @map("ip_address")
+  timestamp  DateTime @default(now())
+
+  @@map("audit_logs")
+}
