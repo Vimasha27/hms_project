@@ -3,6 +3,8 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export const AppLayout: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -12,25 +14,30 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-800 font-sans">
+    <div className="flex min-h-screen bg-background text-foreground font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10 shadow-xs">
+        <header className="h-16 bg-card border-b border-border px-8 flex items-center justify-between sticky top-0 z-10 shadow-xs">
           <div>
-            <h2 className="text-base font-semibold text-slate-700">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground">
               Hospital Operations Console
             </h2>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-xs text-slate-400">Current Session</p>
-              <p className="text-xs font-semibold text-slate-700">{user?.email}</p>
+              <p className="text-xs text-muted-foreground">Current Session</p>
+              <p className="text-xs font-semibold text-foreground">{user?.email}</p>
             </div>
-            <button className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors relative">
+            {user?.role && (
+              <Badge variant="secondary" className="font-medium text-xs">
+                {user.role}
+              </Badge>
+            )}
+            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
               <Bell className="w-5 h-5" />
-              <span className="w-2 h-2 bg-emerald-500 rounded-full absolute top-1.5 right-1.5" />
-            </button>
+              <span className="w-2 h-2 bg-emerald-500 rounded-full absolute top-2 right-2 ring-2 ring-card" />
+            </Button>
           </div>
         </header>
 

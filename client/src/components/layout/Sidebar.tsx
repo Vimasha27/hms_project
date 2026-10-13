@@ -15,6 +15,8 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface NavItem {
   name: string;
@@ -92,31 +94,35 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-slate-900 text-slate-100 flex flex-col min-h-screen">
       {/* Brand Header */}
-      <div className="p-6 flex items-center gap-3 border-b border-slate-800">
-        <div className="bg-primary-500 text-white p-2.5 rounded-xl shadow-md">
-          <Hospital className="w-6 h-6 text-white" />
+      <div className="p-6 flex items-center gap-3">
+        <div className="bg-primary text-primary-foreground p-2.5 rounded-lg shadow-sm">
+          <Hospital className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="font-bold text-lg text-white leading-tight tracking-wide">CareSync</h1>
+          <h1 className="font-bold text-base text-white leading-tight tracking-wide">CareSync</h1>
           <p className="text-xs text-slate-400 font-medium">Hospital System</p>
         </div>
       </div>
 
+      <Separator className="bg-slate-800" />
+
       {/* User Mini Profile */}
-      <div className="px-6 py-4 border-b border-slate-800/60 bg-slate-900/60 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center font-bold text-white text-sm uppercase">
+      <div className="px-6 py-4 bg-slate-900/50 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm uppercase shadow-sm">
           {user?.username?.slice(0, 2) || 'US'}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white truncate">{user?.username}</p>
-          <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-primary-300 border border-slate-700 uppercase tracking-wider">
+          <Badge variant="outline" className="text-[10px] py-0 px-2 font-mono tracking-wider text-slate-300 border-slate-700 bg-slate-800 uppercase mt-0.5">
             {user?.role}
-          </span>
+          </Badge>
         </div>
       </div>
 
+      <Separator className="bg-slate-800" />
+
       {/* Nav Links */}
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems
           .filter((item) => hasRole(item.roles))
           .map((item) => {
@@ -126,9 +132,9 @@ export const Sidebar: React.FC = () => {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-primary-600 text-white shadow-sm'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`
                 }
@@ -140,11 +146,13 @@ export const Sidebar: React.FC = () => {
           })}
       </nav>
 
+      <Separator className="bg-slate-800" />
+
       {/* Logout */}
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-3">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
