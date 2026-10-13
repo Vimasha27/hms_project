@@ -14,10 +14,12 @@ import { InpatientPage } from './pages/inpatient/InpatientPage';
 import { BillingPage } from './pages/billing/BillingPage';
 import { StaffPage } from './pages/staff/StaffPage';
 import { ReportsPage } from './pages/reports/ReportsPage';
+import { Toaster } from '@/components/ui/sonner';
 
 export const App: React.FC = () => {
   return (
     <AuthProvider>
+      <Toaster position="top-right" richColors />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
