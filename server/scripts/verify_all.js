@@ -65,7 +65,7 @@ async function run() {
     firstName: 'Sarah',
     lastName: 'Connor',
     designation: 'Senior Triage Nurse',
-    phone: '+1 555-0199',
+    phone: '0771234567',
     email: 'sarah.c@caresync.hms',
     salary: 58000
   });
