@@ -67,42 +67,42 @@ export const DashboardPage: React.FC = () => {
       title: 'Total Patients',
       value: metrics?.totalPatients || 0,
       icon: Users,
-      bgColor: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/patients',
     },
     {
       title: "Today's Appointments",
       value: metrics?.todayAppointments || 0,
       icon: Calendar,
-      bgColor: 'bg-teal-50 text-teal-600 dark:bg-teal-950 dark:text-teal-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/appointments',
     },
     {
       title: 'Active Admissions',
       value: metrics?.activeAdmissions || 0,
       icon: BedDouble,
-      bgColor: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/inpatient',
     },
     {
       title: 'Pending Lab Tests',
       value: metrics?.pendingLabs || 0,
       icon: FlaskConical,
-      bgColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/laboratory',
     },
     {
       title: 'Low Stock Alerts',
       value: metrics?.lowStockCount || 0,
       icon: AlertTriangle,
-      bgColor: 'bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/pharmacy',
     },
     {
       title: 'Total Revenue',
       value: `Rs. ${(metrics?.totalRevenue || 0).toLocaleString()}`,
       icon: Banknote,
-      bgColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400',
+      bgColor: 'bg-muted text-foreground',
       link: '/billing',
     },
   ];
@@ -110,18 +110,18 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Banner Card */}
-      <Card className="bg-slate-900 text-white border-none shadow-md overflow-hidden">
+      <Card className="overflow-hidden">
         <CardContent className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Welcome back, {user?.username} 👋
             </h1>
-            <p className="mt-1 text-sm text-slate-300">
+            <p className="mt-1 text-sm text-muted-foreground">
               CareSync HMS is running live. Operational summary for today.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button asChild variant="secondary" size="sm" className="gap-2">
+            <Button asChild variant="outline" size="sm" className="gap-2">
               <Link to="/patients">
                 <PlusCircle className="w-4 h-4" />
                 Register Patient
@@ -214,7 +214,7 @@ export const DashboardPage: React.FC = () => {
                       </TableCell>
                       <TableCell className="font-mono text-xs">{apt.timeSlot}</TableCell>
                       <TableCell>
-                        <Badge variant="success">
+                        <Badge variant="secondary">
                           {apt.status}
                         </Badge>
                       </TableCell>
@@ -238,12 +238,12 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 rounded-lg">
+                <div className="p-2 bg-muted text-foreground rounded-lg">
                   <Stethoscope className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground">Clinical Consultation</p>
-                  <p className="text-[11px] text-muted-foreground">Record diagnosis & Rx</p>
+                  <p className="text-xs text-muted-foreground">Record diagnosis & Rx</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -254,12 +254,12 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 rounded-lg">
+                <div className="p-2 bg-muted text-foreground rounded-lg">
                   <Banknote className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground">Billing & Invoicing</p>
-                  <p className="text-[11px] text-muted-foreground">Generate bills & receipts</p>
+                  <p className="text-xs text-muted-foreground">Generate bills & receipts</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -270,12 +270,12 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/50 transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400 rounded-lg">
+                <div className="p-2 bg-muted text-foreground rounded-lg">
                   <AlertTriangle className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground">Pharmacy Dispensation</p>
-                  <p className="text-[11px] text-muted-foreground">Fulfill pending prescriptions</p>
+                  <p className="text-xs text-muted-foreground">Fulfill pending prescriptions</p>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />

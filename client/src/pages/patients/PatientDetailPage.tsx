@@ -195,7 +195,7 @@ export const PatientDetailPage: React.FC = () => {
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
                   {patient.firstName} {patient.lastName}
                 </h1>
-                <Badge variant="outline" className="font-mono text-xs font-bold text-primary border-primary/30 bg-primary/5">
+                <Badge variant="outline" className="font-mono text-xs">
                   {patient.patientCode}
                 </Badge>
               </div>
@@ -214,11 +214,11 @@ export const PatientDetailPage: React.FC = () => {
               <p className="text-sm font-bold text-destructive mt-0.5">{patient.bloodGroup || 'N/A'}</p>
             </div>
             {patient.allergies && (
-              <div className="px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg max-w-[200px]">
-                <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+              <div className="px-3 py-2 bg-muted border border-border rounded-lg max-w-[200px]">
+                <p className="text-[10px] font-bold text-foreground uppercase tracking-wider flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" /> Allergies
                 </p>
-                <p className="text-xs font-semibold text-amber-700 truncate mt-0.5">
+                <p className="text-xs font-semibold text-muted-foreground truncate mt-0.5">
                   {patient.allergies}
                 </p>
               </div>
@@ -451,13 +451,13 @@ export const PatientDetailPage: React.FC = () => {
                       <TableCell className="text-xs">Dr. {lab.doctor.user.username}</TableCell>
                       <TableCell className="text-xs">{lab.urgency}</TableCell>
                       <TableCell>
-                        <Badge variant="info">
+                        <Badge variant="secondary">
                           {lab.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-xs">
                         {lab.result ? (
-                          <span className="font-semibold text-emerald-600">
+                          <span className="font-semibold text-foreground">
                             {lab.result.resultValue}
                           </span>
                         ) : (
@@ -500,7 +500,7 @@ export const PatientDetailPage: React.FC = () => {
                         Rs. {Number(inv.netAmount).toFixed(2)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={inv.status === 'PAID' ? 'success' : 'outline'}>
+                        <Badge variant={inv.status === 'PAID' ? 'default' : 'outline'}>
                           {inv.status}
                         </Badge>
                       </TableCell>

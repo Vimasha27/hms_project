@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 
 interface NavItem {
   name: string;
@@ -92,34 +93,34 @@ export const Sidebar: React.FC = () => {
   const { user, logout, hasRole } = useAuth();
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-100 flex flex-col min-h-screen">
+    <aside className="w-64 bg-card text-card-foreground border-r border-border flex flex-col min-h-screen">
       {/* Brand Header */}
       <div className="p-6 flex items-center gap-3">
         <div className="bg-primary text-primary-foreground p-2.5 rounded-lg shadow-sm">
           <Hospital className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="font-bold text-base text-white leading-tight tracking-wide">CareSync</h1>
-          <p className="text-xs text-slate-400 font-medium">Hospital System</p>
+          <h1 className="font-bold text-base text-foreground leading-tight tracking-wide">CareSync</h1>
+          <p className="text-xs text-muted-foreground font-medium">Hospital System</p>
         </div>
       </div>
 
-      <Separator className="bg-slate-800" />
+      <Separator />
 
       {/* User Mini Profile */}
-      <div className="px-6 py-4 bg-slate-900/50 flex items-center gap-3">
+      <div className="px-6 py-4 flex items-center gap-3 bg-muted/30">
         <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm uppercase shadow-sm">
           {user?.username?.slice(0, 2) || 'US'}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{user?.username}</p>
-          <Badge variant="outline" className="text-[10px] py-0 px-2 font-mono tracking-wider text-slate-300 border-slate-700 bg-slate-800 uppercase mt-0.5">
+          <p className="text-sm font-semibold text-foreground truncate">{user?.username}</p>
+          <Badge variant="secondary" className="text-[10px] py-0 px-2 font-mono tracking-wider uppercase mt-0.5">
             {user?.role}
           </Badge>
         </div>
       </div>
 
-      <Separator className="bg-slate-800" />
+      <Separator />
 
       {/* Nav Links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -135,7 +136,7 @@ export const Sidebar: React.FC = () => {
                   `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`
                 }
               >
@@ -146,17 +147,18 @@ export const Sidebar: React.FC = () => {
           })}
       </nav>
 
-      <Separator className="bg-slate-800" />
+      <Separator />
 
       {/* Logout */}
       <div className="p-3">
-        <button
+        <Button
+          variant="ghost"
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 transition-colors"
+          className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
-        </button>
+        </Button>
       </div>
     </aside>
   );

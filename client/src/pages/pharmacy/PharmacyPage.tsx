@@ -160,7 +160,7 @@ export const PharmacyPage: React.FC = () => {
           )}
 
           {alerts.expiringBatches?.length > 0 && (
-            <Alert variant="warning">
+            <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 <strong>Expiring Soon ({alerts.expiringBatches.length} batches within 30 days):</strong>{' '}
@@ -221,7 +221,7 @@ export const PharmacyPage: React.FC = () => {
                             Low Stock
                           </Badge>
                         ) : (
-                          <Badge variant="success">
+                          <Badge variant="secondary">
                             In Stock
                           </Badge>
                         )}
@@ -284,7 +284,7 @@ export const PharmacyPage: React.FC = () => {
 
                   <Button
                     onClick={() => handleDispense(rx.id)}
-                    className="gap-2 self-start md:self-center bg-emerald-600 hover:bg-emerald-700"
+                    className="gap-2 self-start md:self-center"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Dispense & Deduct Stock

@@ -202,10 +202,10 @@ export const LabPage: React.FC = () => {
                       <Badge
                         variant={
                           req.status === 'COMPLETED'
-                            ? 'success'
+                            ? 'default'
                             : req.status === 'SAMPLE_COLLECTED'
-                            ? 'warning'
-                            : 'info'
+                            ? 'secondary'
+                            : 'outline'
                         }
                       >
                         {req.status.replace('_', ' ')}
@@ -215,7 +215,7 @@ export const LabPage: React.FC = () => {
                       {req.result ? (
                         <div>
                           <p className="font-bold text-foreground">{req.result.resultValue}</p>
-                          <p className="text-muted-foreground text-[11px]">{req.result.interpretation}</p>
+                          <p className="text-muted-foreground text-xs">{req.result.interpretation}</p>
                         </div>
                       ) : (
                         <span className="text-muted-foreground italic">
@@ -227,8 +227,9 @@ export const LabPage: React.FC = () => {
                       <div className="flex items-center justify-end gap-1.5">
                         {req.status === 'REQUESTED' && (
                           <Button
+                            variant="outline"
                             size="sm"
-                            className="h-7 text-xs gap-1 bg-amber-500 hover:bg-amber-600 text-white"
+                            className="h-7 text-xs gap-1"
                             onClick={() => handleCollectSpecimen(req.id)}
                             title="Acknowledge sample collection from patient"
                           >

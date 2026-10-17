@@ -142,7 +142,7 @@ export const InpatientPage: React.FC = () => {
                       <CardTitle className="text-lg font-bold">{w.name}</CardTitle>
                       <CardDescription>
                         Type: <span className="font-semibold text-foreground">{w.type}</span> • Daily
-                        Rate: <span className="font-semibold text-emerald-600">Rs. {Number(w.dailyRate).toFixed(2)}</span>
+                        Rate: <span className="font-semibold text-foreground">Rs. {Number(w.dailyRate).toFixed(2)}</span>
                       </CardDescription>
                     </div>
                     <Badge variant="secondary" className="self-start sm:self-center font-medium">
@@ -162,14 +162,14 @@ export const InpatientPage: React.FC = () => {
                           className={`p-3.5 rounded-lg border flex flex-col justify-between min-h-[120px] transition-all ${
                             b.isOccupied
                               ? 'bg-destructive/5 border-destructive/20 text-foreground'
-                              : 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-foreground hover:shadow-xs'
+                              : 'bg-card border-border text-foreground hover:bg-muted/50'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-mono font-bold text-sm">{b.bedNumber}</span>
                             <span
                               className={`w-2.5 h-2.5 rounded-full ${
-                                b.isOccupied ? 'bg-destructive ring-2 ring-destructive/20' : 'bg-emerald-500 ring-2 ring-emerald-500/20'
+                                b.isOccupied ? 'bg-destructive ring-2 ring-destructive/20' : 'bg-primary ring-2 ring-primary/20'
                               }`}
                             />
                           </div>
@@ -179,12 +179,12 @@ export const InpatientPage: React.FC = () => {
                               <p className="text-xs font-bold truncate">
                                 {activeAdm.patient.firstName} {activeAdm.patient.lastName}
                               </p>
-                              <p className="text-[10px] text-muted-foreground truncate">
+                              <p className="text-xs text-muted-foreground truncate">
                                 Dr. {activeAdm.doctor.user.username}
                               </p>
                             </div>
                           ) : (
-                            <p className="text-[11px] text-emerald-600 font-semibold my-2">
+                            <p className="text-xs text-muted-foreground font-medium my-2">
                               Available Bed
                             </p>
                           )}
@@ -199,7 +199,7 @@ export const InpatientPage: React.FC = () => {
                                   setDischargeSummary('Patient recovered satisfactorily.');
                                   setShowDischargeModal(true);
                                 }}
-                                className="w-full h-7 text-[11px] font-semibold"
+                                className="w-full h-7 text-xs font-semibold"
                               >
                                 Discharge
                               </Button>
@@ -207,7 +207,7 @@ export const InpatientPage: React.FC = () => {
                               <Button
                                 size="sm"
                                 onClick={() => handleOpenAdmit(b)}
-                                className="w-full h-7 text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="w-full h-7 text-xs font-semibold"
                               >
                                 Admit Patient
                               </Button>

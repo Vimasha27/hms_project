@@ -53,17 +53,17 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-muted/40 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <div className="inline-flex p-3 rounded-2xl bg-primary text-primary-foreground shadow-lg mb-3">
+        <div className="inline-flex p-3 rounded-2xl bg-primary text-primary-foreground shadow-sm mb-3">
           <Hospital className="w-8 h-8" />
         </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight">CareSync HMS</h2>
-        <p className="mt-1 text-sm text-slate-400">Hospital Management & Clinical Care Platform</p>
+        <h2 className="text-2xl font-bold text-foreground tracking-tight">CareSync HMS</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Hospital Management & Clinical Care Platform</p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Card className="shadow-2xl border-border bg-card">
+        <Card className="shadow-md border-border bg-card">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-xl font-semibold">Sign In</CardTitle>
             <CardDescription>

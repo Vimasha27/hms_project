@@ -63,7 +63,7 @@ export const PrintableReceiptModal: React.FC<Props> = ({ invoice, onClose }) => 
               </div>
             </div>
             <div className="text-right">
-              <Badge variant={invoice.status === 'PAID' ? 'success' : 'outline'} className="font-mono">
+              <Badge variant={invoice.status === 'PAID' ? 'default' : 'outline'} className="font-mono">
                 {invoice.status}
               </Badge>
               <p className="text-xs font-mono font-bold text-foreground mt-2">
@@ -91,10 +91,10 @@ export const PrintableReceiptModal: React.FC<Props> = ({ invoice, onClose }) => 
                 Total Billed: <strong className="font-mono">Rs. {Number(invoice.netAmount).toFixed(2)}</strong>
               </p>
               <p className="text-foreground">
-                Total Paid: <strong className="font-mono text-emerald-600">Rs. {totalPaid.toFixed(2)}</strong>
+                Total Paid: <strong className="font-mono text-foreground">Rs. {totalPaid.toFixed(2)}</strong>
               </p>
               <p className="text-foreground">
-                Balance Due: <strong className="font-mono text-rose-600">Rs. {balanceDue.toFixed(2)}</strong>
+                Balance Due: <strong className="font-mono text-destructive">Rs. {balanceDue.toFixed(2)}</strong>
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export const PrintableReceiptModal: React.FC<Props> = ({ invoice, onClose }) => 
                 <span className="font-mono">Rs. {Number(invoice.totalAmount).toFixed(2)}</span>
               </div>
               {Number(invoice.discountAmount) > 0 && (
-                <div className="flex justify-between text-rose-600">
+                <div className="flex justify-between text-destructive">
                   <span>Discount:</span>
                   <span className="font-mono">-Rs. {Number(invoice.discountAmount).toFixed(2)}</span>
                 </div>
@@ -166,7 +166,7 @@ export const PrintableReceiptModal: React.FC<Props> = ({ invoice, onClose }) => 
                     {new Date(p.paymentDate).toLocaleDateString()} — {p.paymentMethod}{' '}
                     {p.transactionRef && `(${p.transactionRef})`}
                   </span>
-                  <span className="font-mono font-bold text-emerald-600">
+                  <span className="font-mono font-bold text-foreground">
                     +Rs. {Number(p.amountPaid).toFixed(2)}
                   </span>
                 </div>

@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 text-slate-500 font-medium">
+      <div className="flex items-center justify-center min-h-screen bg-background text-muted-foreground font-medium text-sm">
         Loading CareSync HMS...
       </div>
     );

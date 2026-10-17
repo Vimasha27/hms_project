@@ -27,7 +27,7 @@ export const PrintableLabReportModal: React.FC<Props> = ({ request, onClose }) =
         <DialogHeader className="print:hidden pb-2">
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <FlaskConical className="w-4 h-4 text-teal-600" />
+              <FlaskConical className="w-4 h-4 text-primary" />
               Official Diagnostic Test Report
             </DialogTitle>
             <Button
@@ -46,7 +46,7 @@ export const PrintableLabReportModal: React.FC<Props> = ({ request, onClose }) =
           {/* Header */}
           <div className="flex justify-between items-start border-b-2 border-foreground pb-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-teal-600 text-white rounded-lg">
+              <div className="p-2.5 bg-primary text-primary-foreground rounded-lg">
                 <FlaskConical className="w-6 h-6" />
               </div>
               <div>
@@ -60,7 +60,7 @@ export const PrintableLabReportModal: React.FC<Props> = ({ request, onClose }) =
               </div>
             </div>
             <div className="text-right">
-              <Badge variant="success" className="font-semibold text-xs">
+              <Badge variant="default" className="font-semibold text-xs">
                 VERIFIED REPORT
               </Badge>
               <p className="text-xs font-mono font-bold text-foreground mt-2">
@@ -126,7 +126,7 @@ export const PrintableLabReportModal: React.FC<Props> = ({ request, onClose }) =
                     <td className="py-3 px-3 font-mono text-muted-foreground">
                       {request.result?.normalRange || request.test?.standardRange || 'N/A'}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-emerald-600">Normal</td>
+                    <td className="py-3 px-3 font-semibold text-foreground">Normal</td>
                   </tr>
                 </tbody>
               </table>
@@ -154,7 +154,7 @@ export const PrintableLabReportModal: React.FC<Props> = ({ request, onClose }) =
               </p>
             </div>
             <div>
-              <div className="h-8 flex items-center justify-center text-teal-600 font-serif font-bold italic">
+              <div className="h-8 flex items-center justify-center text-foreground font-serif font-bold italic">
                 Dr. A. Pathologist, MD
               </div>
               <p className="border-t border-dashed border-muted-foreground/60 pt-1 text-muted-foreground">

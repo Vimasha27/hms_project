@@ -319,7 +319,7 @@ export const StaffPage: React.FC = () => {
                         <TableCell>
                           {att ? (
                             <Badge
-                              variant={att.status === 'PRESENT' ? 'success' : 'destructive'}
+                              variant={att.status === 'PRESENT' ? 'default' : 'destructive'}
                             >
                               {att.status}
                             </Badge>
@@ -331,15 +331,15 @@ export const StaffPage: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-7 text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                            className="h-7 text-xs"
                             onClick={() => handleMarkAttendance(emp.id, 'PRESENT')}
                           >
                             Present
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="h-7 text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
+                            className="h-7 text-xs"
                             onClick={() => handleMarkAttendance(emp.id, 'ABSENT')}
                           >
                             Absent
@@ -393,10 +393,10 @@ export const StaffPage: React.FC = () => {
                           <Badge
                             variant={
                               l.status === 'APPROVED'
-                                ? 'success'
+                                ? 'default'
                                 : l.status === 'REJECTED'
                                 ? 'destructive'
-                                : 'warning'
+                                : 'secondary'
                             }
                           >
                             {l.status}
@@ -409,16 +409,16 @@ export const StaffPage: React.FC = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="h-7 text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50 gap-1"
+                                  className="h-7 text-xs gap-1"
                                   onClick={() => handleUpdateLeaveStatus(l.id, 'APPROVED')}
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
                                   Approve
                                 </Button>
                                 <Button
-                                  variant="outline"
+                                  variant="destructive"
                                   size="sm"
-                                  className="h-7 text-xs text-rose-600 border-rose-200 hover:bg-rose-50 gap-1"
+                                  className="h-7 text-xs gap-1"
                                   onClick={() => handleUpdateLeaveStatus(l.id, 'REJECTED')}
                                 >
                                   <XCircle className="w-3 h-3" />

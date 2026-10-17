@@ -112,7 +112,7 @@ export const ReportsPage: React.FC = () => {
           <Button
             onClick={handleExportCSV}
             size="sm"
-            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="gap-2"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -141,10 +141,10 @@ export const ReportsPage: React.FC = () => {
             </Card>
             <Card>
               <CardContent className="p-6">
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Total Payments Collected
                 </p>
-                <p className="text-2xl font-bold text-emerald-600 mt-2 font-mono">
+                <p className="text-2xl font-bold text-foreground mt-2 font-mono">
                   Rs. {(financialData?.totalCollected || 0).toLocaleString()}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">Cash, Card, Online & Insurance settlements</p>
@@ -152,10 +152,10 @@ export const ReportsPage: React.FC = () => {
             </Card>
             <Card>
               <CardContent className="p-6">
-                <p className="text-xs font-bold uppercase tracking-wider text-rose-600">
+                <p className="text-xs font-bold uppercase tracking-wider text-destructive">
                   Outstanding Balance (AR)
                 </p>
-                <p className="text-2xl font-bold text-rose-600 mt-2 font-mono">
+                <p className="text-2xl font-bold text-destructive mt-2 font-mono">
                   Rs.{' '}
                   {Math.max(
                     0,
@@ -172,7 +172,7 @@ export const ReportsPage: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-bold flex items-center gap-2">
-                  <Banknote className="w-4 h-4 text-emerald-600" />
+                  <Banknote className="w-4 h-4 text-primary" />
                   Revenue Trajectory (Daily)
                 </CardTitle>
                 <CardDescription>Daily financial collection across time window</CardDescription>

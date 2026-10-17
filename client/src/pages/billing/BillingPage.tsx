@@ -224,9 +224,9 @@ export const BillingPage: React.FC = () => {
                       <Badge
                         variant={
                           inv.status === 'PAID'
-                            ? 'success'
+                            ? 'default'
                             : inv.status === 'PARTIAL'
-                            ? 'warning'
+                            ? 'secondary'
                             : 'destructive'
                         }
                       >
@@ -248,7 +248,7 @@ export const BillingPage: React.FC = () => {
                         {inv.status !== 'PAID' && (
                           <Button
                             size="sm"
-                            className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="h-7 text-xs"
                             onClick={() => handleOpenPayment(inv)}
                           >
                             Receive Payment
@@ -471,7 +471,7 @@ export const BillingPage: React.FC = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button type="submit">
                 Record Payment & Issue Receipt
               </Button>
             </DialogFooter>

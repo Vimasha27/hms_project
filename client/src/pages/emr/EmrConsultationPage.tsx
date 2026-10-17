@@ -156,7 +156,7 @@ export const EmrConsultationPage: React.FC = () => {
       </div>
 
       {successMsg && (
-        <Alert variant="success">
+        <Alert>
           <CheckCircle2 className="h-4 w-4" />
           <AlertDescription>{successMsg}</AlertDescription>
         </Alert>
@@ -192,7 +192,7 @@ export const EmrConsultationPage: React.FC = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <Activity className="w-4 h-4 text-rose-500" />
+              <Activity className="w-4 h-4 text-primary" />
               2. Patient Vitals
             </CardTitle>
             <CardDescription>Clinical vital signs measured at triage / consultation</CardDescription>
@@ -325,7 +325,7 @@ export const EmrConsultationPage: React.FC = () => {
                     className="p-3.5 rounded-lg border border-border bg-muted/40 flex flex-wrap gap-3 items-end"
                   >
                     <div className="flex-1 min-w-[180px] space-y-1">
-                      <Label className="text-[11px]">Drug</Label>
+                      <Label className="text-xs">Drug</Label>
                       <Select
                         value={item.medicineId}
                         onValueChange={(val) => updatePrescriptionRow(idx, 'medicineId', val)}
@@ -343,7 +343,7 @@ export const EmrConsultationPage: React.FC = () => {
                       </Select>
                     </div>
                     <div className="w-24 space-y-1">
-                      <Label className="text-[11px]">Dosage</Label>
+                      <Label className="text-xs">Dosage</Label>
                       <Input
                         value={item.dosage}
                         onChange={(e) => updatePrescriptionRow(idx, 'dosage', e.target.value)}
@@ -352,7 +352,7 @@ export const EmrConsultationPage: React.FC = () => {
                       />
                     </div>
                     <div className="w-24 space-y-1">
-                      <Label className="text-[11px]">Freq</Label>
+                      <Label className="text-xs">Freq</Label>
                       <Input
                         value={item.frequency}
                         onChange={(e) => updatePrescriptionRow(idx, 'frequency', e.target.value)}
@@ -361,7 +361,7 @@ export const EmrConsultationPage: React.FC = () => {
                       />
                     </div>
                     <div className="w-20 space-y-1">
-                      <Label className="text-[11px]">Days</Label>
+                      <Label className="text-xs">Days</Label>
                       <Input
                         type="number"
                         value={item.durationDays}
@@ -372,7 +372,7 @@ export const EmrConsultationPage: React.FC = () => {
                       />
                     </div>
                     <div className="w-20 space-y-1">
-                      <Label className="text-[11px]">Qty</Label>
+                      <Label className="text-xs">Qty</Label>
                       <Input
                         type="number"
                         value={item.quantityRequired}

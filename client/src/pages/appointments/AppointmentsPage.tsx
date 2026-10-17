@@ -243,7 +243,7 @@ export const AppointmentsPage: React.FC = () => {
                       <Badge
                         variant={
                           apt.status === 'COMPLETED'
-                            ? 'success'
+                            ? 'default'
                             : apt.status === 'CANCELLED'
                             ? 'destructive'
                             : 'secondary'
@@ -258,7 +258,7 @@ export const AppointmentsPage: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-7 text-xs text-amber-600 border-amber-200 hover:bg-amber-50"
+                            className="h-7 text-xs"
                             onClick={() => {
                               setRescheduleApt(apt);
                               setNewDate(new Date(apt.appointmentDate).toISOString().split('T')[0]);
@@ -271,16 +271,16 @@ export const AppointmentsPage: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-7 text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50 gap-1"
+                            className="h-7 text-xs gap-1"
                             onClick={() => updateStatus(apt.id, 'COMPLETED')}
                           >
                             <CheckCircle2 className="w-3 h-3" />
                             Done
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
-                            className="h-7 text-xs text-rose-600 border-rose-200 hover:bg-rose-50 gap-1"
+                            className="h-7 text-xs gap-1"
                             onClick={() => updateStatus(apt.id, 'CANCELLED')}
                           >
                             <XCircle className="w-3 h-3" />

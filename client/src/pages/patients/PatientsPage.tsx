@@ -180,7 +180,7 @@ export const PatientsPage: React.FC = () => {
                       {new Date(p.dob).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="destructive" className="font-semibold text-xs">
+                      <Badge variant="outline" className="font-semibold text-xs">
                         {p.bloodGroup || 'N/A'}
                       </Badge>
                     </TableCell>
