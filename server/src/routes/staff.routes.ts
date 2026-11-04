@@ -2,6 +2,8 @@ import { Router } from 'express';
 import {
   listEmployees,
   createEmployee,
+  resetEmployeePassword,
+  toggleEmployeeStatus,
   listAttendance,
   recordAttendance,
   listLeaveRequests,
@@ -18,6 +20,8 @@ router.use(authenticate);
 // Employees
 router.get('/employees', listEmployees);
 router.post('/employees', authorize(['ADMIN']), createEmployee);
+router.post('/employees/:id/reset-password', authorize(['ADMIN']), resetEmployeePassword);
+router.patch('/employees/:id/status', authorize(['ADMIN']), toggleEmployeeStatus);
 
 // Attendance
 router.get('/attendance', listAttendance);

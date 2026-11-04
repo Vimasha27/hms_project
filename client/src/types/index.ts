@@ -15,6 +15,34 @@ export interface User {
   isActive: boolean;
 }
 
+export interface Employee {
+  id: string;
+  userId?: string | null;
+  employeeCode: string;
+  firstName: string;
+  lastName: string;
+  designation: string;
+  departmentId?: string | null;
+  phone: string;
+  email?: string | null;
+  joiningDate: string;
+  salary?: number | null;
+  createdAt: string;
+  updatedAt: string;
+  department?: {
+    id: string;
+    name: string;
+    description?: string | null;
+  } | null;
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+    role: Role;
+    isActive: boolean;
+  } | null;
+}
+
 export interface Patient {
   id: string;
   patientCode: string;
