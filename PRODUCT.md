@@ -53,7 +53,7 @@ Unlike bloated enterprise hospital software with steep learning curves or fragme
 
 - **Product Identity**: CareSync HMS — Hospital Management System.
 - **Voice & Tone**: Clinical, dependable, reassuring, precise, and professional.
-- **Visual Personality**: High-trust medical slate and deep blue/teal foundation, crisp data-dense tables, monospaced figures for financial and clinical values, and distinct semantic state badges.
+- **Visual Personality**: High-trust clinical teal and botanical green foundation (`#287A74` primary dark, `#38967E` primary, `#5AB27F` secondary, `#86CC7B` accent green, `#BCE475` light green, `#F9F871` highlight, `#F4FAF5` soft surface, `#FFFFFF` card background, and `#204A46` deep forest-teal text), crisp data-dense tables, monospaced figures for financial and clinical values, and distinct semantic state badges.
 
 ## Evidence on Hand
 

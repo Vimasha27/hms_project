@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Medicine } from '../../types';
-import { Pill, AlertTriangle, Plus, CheckCircle, Package } from 'lucide-react';
+import { Pill, AlertTriangle, Plus, CheckCircle, Package, Filter, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Card,
@@ -38,11 +39,20 @@ import {
 } from '@/components/ui/dialog';
 
 export const PharmacyPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'inventory' | 'prescriptions'>('inventory');
   const [loading, setLoading] = useState(true);
+  const [filterLowStock, setFilterLowStock] = useState(searchParams.get('filter') === 'low-stock');
+
+  useEffect(() => {
+    if (searchParams.get('filter') === 'low-stock') {
+      setFilterLowStock(true);
+      setActiveTab('inventory');
+    }
+  }, [searchParams]);
   const [showAddMed, setShowAddMed] = useState(false);
   const [showAddBatch, setShowAddBatch] = useState(false);
   const [selectedMedId, setSelectedMedId] = useState('');
@@ -187,7 +197,30 @@ export const PharmacyPage: React.FC = () => {
         </TabsList>
 
         {/* Tab 1: Inventory */}
-        <TabsContent value="inventory" className="mt-4">
+        <TabsContent value="inventory" className="mt-4 space-y-3">
+          {filterLowStock && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-xs">
+              <span className="font-semibold text-destructive flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                Filtered by: Low Stock Items ({medicines.filter((m: any) => m.isLowStock).length} batches below reorder level)
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFilterLowStock(false);
+                  const newParams = new URLSearchParams(searchParams);
+                  newParams.delete('filter');
+                  setSearchParams(newParams, { replace: true });
+                }}
+                className="h-7 text-xs text-destructive hover:bg-destructive/15 gap-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                Show All Items
+              </Button>
+            </div>
+          )}
+
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -203,7 +236,7 @@ export const PharmacyPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {medicines.map((m: any) => (
+                  {(filterLowStock ? medicines.filter((m: any) => m.isLowStock) : medicines).map((m: any) => (
                     <TableRow key={m.id}>
                       <TableCell className="font-semibold text-foreground">
                         {m.name}

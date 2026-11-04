@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Invoice, Patient } from '../../types';
 import { Receipt, Plus, Trash2, Printer } from 'lucide-react';
@@ -33,6 +34,7 @@ import {
 } from '@/components/ui/dialog';
 
 export const BillingPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,9 +50,19 @@ export const BillingPage: React.FC = () => {
       serviceType: 'CONSULTATION',
       itemDescription: 'Cardiology Specialist Consultation Fee',
       quantity: 1,
-      unitPrice: 150.0,
+      unitPrice: 3500.0,
     },
   ]);
+
+  // Auto-open modal on ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowInvoiceModal(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Payment Modal
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -86,7 +98,7 @@ export const BillingPage: React.FC = () => {
         serviceType: 'PHARMACY',
         itemDescription: 'Prescribed Medications',
         quantity: 1,
-        unitPrice: 25.0,
+        unitPrice: 850.0,
       },
     ]);
   };
@@ -354,6 +366,7 @@ export const BillingPage: React.FC = () => {
                     size="icon"
                     onClick={() => removeItemRow(idx)}
                     className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                    aria-label="Remove item"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>

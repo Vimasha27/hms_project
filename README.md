@@ -8,7 +8,7 @@ CareSync is a full-stack, enterprise-grade Hospital Management System designed t
 
 - **Backend**: Node.js, Express.js, TypeScript, Prisma ORM, JWT, Bcrypt, Zod
 - **Frontend**: React.js, TypeScript, Vite, Tailwind CSS, Lucide Icons, React Router
-- **Database**: PostgreSQL (port 5432) with relational schema and ACID transactions
+- **Database**: PostgreSQL (Cloud or Local) with relational schema and ACID transactions
 - **Data Safety & Integrity**: Role-Based Access Control (RBAC), Audit Trails, FIFO Pharmacy Dispensation
 
 ---
@@ -18,7 +18,7 @@ CareSync is a full-stack, enterprise-grade Hospital Management System designed t
 - **Frontend Application**: [http://localhost:5173](http://localhost:5173)
 - **Backend REST API**: [http://localhost:5000](http://localhost:5000)
 - **API Health Check**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
-- **Database Connection**: `postgresql://postgres:password@localhost:5432/hms_db`
+- **Database Connection**: Configured in `server/.env` (supports Cloud PostgreSQL or Local)
 
 ---
 
@@ -66,7 +66,10 @@ hms_project/
 │   │   ├── routes/             # Express API router declarations
 │   │   └── utils/              # Prisma client singleton
 │   └── scripts/
-│       └── run-db.ts           # PostgreSQL daemon starter
+│       ├── check-db.ts         # Database connection diagnostic tool
+│       ├── backup-db.ts        # Database JSON backup utility
+│       └── restore-db.ts       # Database JSON restore utility
+├── docker-compose.yml          # Optional local PostgreSQL container setup
 └── docs/
     ├── project_specification.md
     └── implementation_plan.md
@@ -74,23 +77,73 @@ hms_project/
 
 ---
 
-## 🛠️ Running the Application
+## 🛠️ Database Setup (Cloud or Local)
 
-### 1. Database
+CareSync HMS connects to any standard PostgreSQL database. You can use a managed **Cloud Database** or a **Local Database**.
+
+### Option A: Cloud Database (Recommended)
+1. Create a PostgreSQL database on any provider:
+   - **Supabase**: [supabase.com](https://supabase.com)
+   - **Neon**: [neon.tech](https://neon.tech)
+   - **Render**: [render.com](https://render.com)
+   - **Railway**: [railway.app](https://railway.app)
+   - **AWS RDS / GCP Cloud SQL / Azure Database**
+2. Copy your connection URI and update `server/.env`:
+   ```env
+   DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:[PORT]/[DATABASE]?sslmode=require"
+   ```
+3. Test your connection:
+   ```bash
+   cd server
+   npm run db:check
+   ```
+4. Push the schema and seed initial demo data:
+   ```bash
+   npm run db:push
+   npm run prisma:seed
+   ```
+
+### Option B: Local Database
+If you prefer running PostgreSQL locally, you have two options:
+
+- **Via Docker (Quickest)**:
+  ```bash
+  docker compose up -d
+  ```
+  *(Spins up a lightweight PostgreSQL 16 container at `localhost:5432`)*
+
+- **Via Installed PostgreSQL (Windows / Linux / macOS)**:
+  Ensure PostgreSQL is running locally and set `DATABASE_URL` in `server/.env`:
+  ```env
+  DATABASE_URL="postgresql://postgres:password@localhost:5432/hms_db"
+  ```
+
+Then apply schema and seed data:
 ```bash
 cd server
+npm run db:push
 npm run prisma:seed
 ```
 
-### 2. Backend API
-```bash
-cd server
-npm start        # Production compiled build
-# or
-npm run dev      # Development with watch mode
+---
+
+## 🛠️ Running the Application
+
+### 1. Start All Services (Windows batch)
+Double-click `start_all.bat` or run:
+```cmd
+start_all.bat
 ```
 
-### 3. Frontend App
+### 2. Manual Startup
+
+**Backend API**:
+```bash
+cd server
+npm run dev
+```
+
+**Frontend App**:
 ```bash
 cd client
 npm run dev

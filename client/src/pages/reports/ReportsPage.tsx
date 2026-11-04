@@ -37,7 +37,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 
-const COLORS = ['#2563eb', '#0d9488', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'];
+const COLORS = ['#287A74', '#38967E', '#5AB27F', '#86CC7B', '#BCE475', '#F9F871'];
 
 export const ReportsPage: React.FC = () => {
   const [financialData, setFinancialData] = useState<any>(null);
@@ -186,11 +186,11 @@ export const ReportsPage: React.FC = () => {
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={financialData?.dailyRevenue}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                        <YAxis tick={{ fontSize: 11 }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#cde3dc" />
+                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#204A46' }} />
+                        <YAxis tick={{ fontSize: 11, fill: '#204A46' }} />
                         <Tooltip formatter={(value: any) => [`Rs. ${Number(value).toLocaleString()}`, 'Revenue']} />
-                        <Bar dataKey="revenue" fill="#0d9488" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="revenue" fill="#287A74" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>

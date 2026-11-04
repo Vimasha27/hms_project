@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Patient } from '../../types';
 import { Users, Search, Plus, Eye, Phone } from 'lucide-react';
@@ -34,16 +34,27 @@ import {
 } from '@/components/ui/table';
 
 export const PatientsPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+
+  // Auto-open modal on ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Form State
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    dob: '1990-01-01',
+    dob: '',
     gender: 'MALE',
     bloodGroup: 'O+',
     contactNumber: '',
@@ -147,7 +158,7 @@ export const PatientsPage: React.FC = () => {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-12 text-center text-muted-foreground text-sm">
+            <div role="status" aria-live="polite" className="py-12 text-center text-muted-foreground text-sm">
               Loading patient records...
             </div>
           ) : patients.length === 0 ? (
@@ -243,12 +254,12 @@ export const PatientsPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Gender *</Label>
+                <Label htmlFor="gender-select">Gender *</Label>
                 <Select
                   value={formData.gender}
                   onValueChange={(val) => setFormData({ ...formData, gender: val })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="gender-select" aria-label="Gender">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>

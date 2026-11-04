@@ -4,65 +4,90 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --color-primary-dark: #287A74;
+    --color-primary: #38967E;
+    --color-secondary: #5AB27F;
+    --color-accent-green: #86CC7B;
+    --color-light-green: #BCE475;
+    --color-highlight: #F9F871;
+
+    --color-background: #FFFFFF;
+    --color-surface: #F4FAF5;
+    --color-text: #204A46;
+
+    /* Semantic token mapping (HSL channels for Tailwind) */
+    --background: 130 43% 97%;
+    --foreground: 174 40% 21%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 174 40% 21%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 174 40% 21%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary action uses #287A74 (5.09:1 contrast with #FFFFFF) */
+    --primary: 176 51% 32%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary & surface hierarchy */
+    --secondary: 132 38% 92%;
+    --secondary-foreground: 174 40% 21%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 130 43% 97%;
+    --muted-foreground: 175 42% 31%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 126 42% 90%;
+    --accent-foreground: 174 40% 21%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 162 28% 85%;
+    --input: 162 28% 82%;
+    --ring: 165 46% 40%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --color-primary-dark: #287A74;
+    --color-primary: #38967E;
+    --color-secondary: #5AB27F;
+    --color-accent-green: #86CC7B;
+    --color-light-green: #BCE475;
+    --color-highlight: #F9F871;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --color-background: #0F2422;
+    --color-surface: #163330;
+    --color-text: #EAF6EE;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --background: 174 41% 10%;
+    --foreground: 140 38% 94%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --card: 174 39% 14%;
+    --card-foreground: 140 38% 94%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --popover: 174 39% 14%;
+    --popover-foreground: 140 38% 94%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --primary: 112 45% 64%;
+    --primary-foreground: 174 45% 12%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --secondary: 173 33% 20%;
+    --secondary-foreground: 140 38% 94%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --muted: 173 33% 19%;
+    --muted-foreground: 152 28% 72%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --accent: 172 35% 23%;
+    --accent-foreground: 140 38% 94%;
+
+    --destructive: 0 63% 35%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 173 30% 24%;
+    --input: 173 30% 24%;
+    --ring: 112 45% 64%;
   }
 }
 
@@ -72,5 +97,25 @@
   }
   body {
     @apply bg-background text-foreground;
+    caret-color: var(--color-primary-dark);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  ::selection {
+    background-color: var(--color-light-green);
+    color: var(--color-text);
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #9CC7BE;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
   }
 }

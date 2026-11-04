@@ -18,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 interface NavItem {
   name: string;
@@ -26,83 +27,120 @@ interface NavItem {
   roles: string[];
 }
 
-const navItems: NavItem[] = [
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
   {
-    name: 'Dashboard',
-    to: '/',
-    icon: LayoutDashboard,
-    roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'LAB_STAFF', 'PHARMACIST', 'ACCOUNTANT'],
+    title: 'Clinical & Front Desk',
+    items: [
+      {
+        name: 'Dashboard',
+        to: '/',
+        icon: LayoutDashboard,
+        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'LAB_STAFF', 'PHARMACIST', 'ACCOUNTANT'],
+      },
+      {
+        name: 'Patients',
+        to: '/patients',
+        icon: Users,
+        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT'],
+      },
+      {
+        name: 'Appointments',
+        to: '/appointments',
+        icon: Calendar,
+        roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'],
+      },
+      {
+        name: 'Consultation & EMR',
+        to: '/emr',
+        icon: Stethoscope,
+        roles: ['ADMIN', 'DOCTOR'],
+      },
+    ],
   },
   {
-    name: 'Patients',
-    to: '/patients',
-    icon: Users,
-    roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT'],
+    title: 'Hospital Operations',
+    items: [
+      {
+        name: 'Pharmacy & Stock',
+        to: '/pharmacy',
+        icon: Pill,
+        roles: ['ADMIN', 'PHARMACIST', 'DOCTOR'],
+      },
+      {
+        name: 'Laboratory',
+        to: '/laboratory',
+        icon: FlaskConical,
+        roles: ['ADMIN', 'LAB_STAFF', 'DOCTOR'],
+      },
+      {
+        name: 'Inpatient (IPD)',
+        to: '/inpatient',
+        icon: BedDouble,
+        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'],
+      },
+    ],
   },
   {
-    name: 'Appointments',
-    to: '/appointments',
-    icon: Calendar,
-    roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'],
-  },
-  {
-    name: 'Consultation & EMR',
-    to: '/emr',
-    icon: Stethoscope,
-    roles: ['ADMIN', 'DOCTOR'],
-  },
-  {
-    name: 'Pharmacy & Stock',
-    to: '/pharmacy',
-    icon: Pill,
-    roles: ['ADMIN', 'PHARMACIST', 'DOCTOR'],
-  },
-  {
-    name: 'Laboratory',
-    to: '/laboratory',
-    icon: FlaskConical,
-    roles: ['ADMIN', 'LAB_STAFF', 'DOCTOR'],
-  },
-  {
-    name: 'Inpatient (IPD)',
-    to: '/inpatient',
-    icon: BedDouble,
-    roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'],
-  },
-  {
-    name: 'Billing & Payments',
-    to: '/billing',
-    icon: Receipt,
-    roles: ['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST'],
-  },
-  {
-    name: 'Staff & HR',
-    to: '/staff',
-    icon: UserCheck,
-    roles: ['ADMIN'],
-  },
-  {
-    name: 'Reports & Analytics',
-    to: '/reports',
-    icon: BarChart3,
-    roles: ['ADMIN', 'ACCOUNTANT'],
+    title: 'Finance & Administration',
+    items: [
+      {
+        name: 'Billing & Payments',
+        to: '/billing',
+        icon: Receipt,
+        roles: ['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST'],
+      },
+      {
+        name: 'Staff & HR',
+        to: '/staff',
+        icon: UserCheck,
+        roles: ['ADMIN'],
+      },
+      {
+        name: 'Reports & Analytics',
+        to: '/reports',
+        icon: BarChart3,
+        roles: ['ADMIN', 'ACCOUNTANT'],
+      },
+    ],
   },
 ];
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { user, logout, hasRole } = useAuth();
 
   return (
-    <aside className="w-64 bg-card text-card-foreground border-r border-border flex flex-col min-h-screen">
+    <aside className="w-64 bg-card text-card-foreground border-r border-border flex flex-col h-full min-h-screen">
       {/* Brand Header */}
-      <div className="p-6 flex items-center gap-3">
-        <div className="bg-primary text-primary-foreground p-2.5 rounded-lg shadow-sm">
-          <Hospital className="w-5 h-5" />
+      <div className="p-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary text-primary-foreground p-2.5 rounded-lg shadow-sm">
+            <Hospital className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="font-bold text-base text-foreground leading-tight tracking-wide">CareSync</h1>
+            <p className="text-xs text-muted-foreground font-medium">Hospital System</p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-bold text-base text-foreground leading-tight tracking-wide">CareSync</h1>
-          <p className="text-xs text-muted-foreground font-medium">Hospital System</p>
-        </div>
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="lg:hidden text-muted-foreground hover:text-foreground -mr-2"
+            aria-label="Close navigation sidebar"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        )}
       </div>
 
       <Separator />
@@ -122,29 +160,42 @@ export const Sidebar: React.FC = () => {
 
       <Separator />
 
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems
-          .filter((item) => hasRole(item.roles))
-          .map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{item.name}</span>
-              </NavLink>
-            );
-          })}
+      {/* Grouped Nav Links */}
+      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto" aria-label="Main Navigation">
+        {navSections.map((section) => {
+          const visibleItems = section.items.filter((item) => hasRole(item.roles));
+          if (visibleItems.length === 0) return null;
+
+          return (
+            <div key={section.title} className="space-y-1">
+              <h2 className="px-3 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                {section.title}
+              </h2>
+              <div className="space-y-0.5 pt-1">
+                {visibleItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => onClose?.()}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`
+                      }
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <span>{item.name}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </nav>
 
       <Separator />

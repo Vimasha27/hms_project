@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Appointment, Doctor, Patient } from '../../types';
 import { Calendar, Clock, Plus, Filter, CheckCircle2, XCircle } from 'lucide-react';
@@ -33,6 +34,7 @@ import {
 } from '@/components/ui/table';
 
 export const AppointmentsPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -40,6 +42,16 @@ export const AppointmentsPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+
+  // Auto-open modal on ?action=new
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('action');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleApt, setRescheduleApt] = useState<Appointment | null>(null);
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
@@ -196,7 +208,7 @@ export const AppointmentsPage: React.FC = () => {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-12 text-center text-muted-foreground text-sm">
+            <div role="status" aria-live="polite" className="py-12 text-center text-muted-foreground text-sm">
               Loading appointment queue...
             </div>
           ) : appointments.length === 0 ? (
