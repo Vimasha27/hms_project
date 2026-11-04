@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Patient } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { Users, Search, Plus, Eye, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,21 +35,25 @@ import {
 } from '@/components/ui/table';
 
 export const PatientsPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canRegister = hasRole(['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Auto-open modal on ?action=new
+  // Auto-open modal on ?action=new if permitted
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
-      setShowModal(true);
+      if (canRegister) {
+        setShowModal(true);
+      }
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('action');
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, canRegister]);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -134,10 +139,12 @@ export const PatientsPage: React.FC = () => {
             Search, register, and review clinical records for all hospital patients.
           </p>
         </div>
-        <Button onClick={() => setShowModal(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Register Patient
-        </Button>
+        {canRegister && (
+          <Button onClick={() => setShowModal(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Register Patient
+          </Button>
+        )}
       </div>
 
       {/* Search Input Card */}

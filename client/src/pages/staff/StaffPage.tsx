@@ -588,7 +588,9 @@ Temporary Password: ${credentialSlip.temporaryPassword}
                     <TableHead>Designation</TableHead>
                     <TableHead>Department</TableHead>
                     <TableHead>Status Today</TableHead>
-                    <TableHead className="text-right">Quick Action</TableHead>
+                    {hasRole(['ADMIN', 'RECEPTIONIST']) && (
+                      <TableHead className="text-right">Quick Action</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -615,24 +617,26 @@ Temporary Password: ${credentialSlip.temporaryPassword}
                             <span className="text-muted-foreground text-xs italic">Not Logged</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right space-x-1.5">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => handleMarkAttendance(emp.id, 'PRESENT')}
-                          >
-                            Present
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => handleMarkAttendance(emp.id, 'ABSENT')}
-                          >
-                            Absent
-                          </Button>
-                        </TableCell>
+                        {hasRole(['ADMIN', 'RECEPTIONIST']) && (
+                          <TableCell className="text-right space-x-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => handleMarkAttendance(emp.id, 'PRESENT')}
+                            >
+                              Present
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => handleMarkAttendance(emp.id, 'ABSENT')}
+                            >
+                              Absent
+                            </Button>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })}

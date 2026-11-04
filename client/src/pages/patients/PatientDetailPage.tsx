@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import api from '../../services/api';
+import api, { getUploadUrl } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import {
   Phone,
   Mail,
@@ -52,6 +53,11 @@ import {
 } from '@/components/ui/dialog';
 
 export const PatientDetailPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canEdit = hasRole(['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE']);
+  const canViewBilling = hasRole(['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST']);
+  const canUploadDocs = hasRole(['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST']);
+
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -223,15 +229,17 @@ export const PatientDetailPage: React.FC = () => {
                 </p>
               </div>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowEditModal(true)}
-              className="gap-1.5"
-            >
-              <Edit className="w-3.5 h-3.5" />
-              Edit Profile
-            </Button>
+            {canEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowEditModal(true)}
+                className="gap-1.5"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                Edit Profile
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -299,10 +307,12 @@ export const PatientDetailPage: React.FC = () => {
             <FlaskConical className="w-3.5 h-3.5" />
             Lab Requests ({patient.labRequests?.length || 0})
           </TabsTrigger>
-          <TabsTrigger value="billing" className="gap-2 text-xs py-2">
-            <Receipt className="w-3.5 h-3.5" />
-            Invoices ({patient.invoices?.length || 0})
-          </TabsTrigger>
+          {canViewBilling && (
+            <TabsTrigger value="billing" className="gap-2 text-xs py-2">
+              <Receipt className="w-3.5 h-3.5" />
+              Invoices ({patient.invoices?.length || 0})
+            </TabsTrigger>
+          )}
           <TabsTrigger value="documents" className="gap-2 text-xs py-2">
             <FileText className="w-3.5 h-3.5" />
             Documents ({documents.length})
@@ -473,44 +483,46 @@ export const PatientDetailPage: React.FC = () => {
         </TabsContent>
 
         {/* Tab 4: Billing */}
-        <TabsContent value="billing" className="mt-4">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Total Amount</TableHead>
-                    <TableHead>Net Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {patient.invoices?.map((inv: any) => (
-                    <TableRow key={inv.id}>
-                      <TableCell className="font-mono font-bold text-xs text-primary">
-                        {inv.invoiceNumber}
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {new Date(inv.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="font-mono">Rs. {Number(inv.totalAmount).toFixed(2)}</TableCell>
-                      <TableCell className="font-mono font-bold text-foreground">
-                        Rs. {Number(inv.netAmount).toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={inv.status === 'PAID' ? 'default' : 'outline'}>
-                          {inv.status}
-                        </Badge>
-                      </TableCell>
+        {canViewBilling && (
+          <TabsContent value="billing" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Invoice #</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Total Amount</TableHead>
+                      <TableHead>Net Amount</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                  </TableHeader>
+                  <TableBody>
+                    {patient.invoices?.map((inv: any) => (
+                      <TableRow key={inv.id}>
+                        <TableCell className="font-mono font-bold text-xs text-primary">
+                          {inv.invoiceNumber}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {new Date(inv.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="font-mono">Rs. {Number(inv.totalAmount).toFixed(2)}</TableCell>
+                        <TableCell className="font-mono font-bold text-foreground">
+                          Rs. {Number(inv.netAmount).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={inv.status === 'PAID' ? 'default' : 'outline'}>
+                            {inv.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         {/* Tab 5: Documents & Scans */}
         <TabsContent value="documents" className="space-y-4 mt-4">
@@ -522,21 +534,23 @@ export const PatientDetailPage: React.FC = () => {
                   Upload scans, medical histories, discharge slips, and external clinical reports (PDF, JPG, PNG).
                 </CardDescription>
               </div>
-              <div>
-                <Label htmlFor="doc-upload" className="cursor-pointer">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-xs font-semibold shadow-sm transition-all">
-                    <Upload className="w-3.5 h-3.5" />
-                    {uploadingDoc ? 'Uploading File...' : 'Upload Document'}
-                  </div>
-                  <Input
-                    id="doc-upload"
-                    type="file"
-                    onChange={handleFileUpload}
-                    disabled={uploadingDoc}
-                    className="hidden"
-                  />
-                </Label>
-              </div>
+              {canUploadDocs && (
+                <div>
+                  <Label htmlFor="doc-upload" className="cursor-pointer">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-xs font-semibold shadow-sm transition-all">
+                      <Upload className="w-3.5 h-3.5" />
+                      {uploadingDoc ? 'Uploading File...' : 'Upload Document'}
+                    </div>
+                    <Input
+                      id="doc-upload"
+                      type="file"
+                      onChange={handleFileUpload}
+                      disabled={uploadingDoc}
+                      className="hidden"
+                    />
+                  </Label>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -572,7 +586,7 @@ export const PatientDetailPage: React.FC = () => {
                         <TableCell className="text-right">
                           <Button asChild variant="secondary" size="sm" className="gap-1.5 h-8">
                             <a
-                              href={`http://localhost:5000/uploads/patients/${doc.fileName}`}
+                              href={getUploadUrl(`/uploads/patients/${doc.fileName}`)}
                               target="_blank"
                               rel="noreferrer"
                             >

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Invoice, Patient } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { Receipt, Plus, Trash2, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { PrintableReceiptModal } from '../../components/billing/PrintableReceiptModal';
@@ -34,6 +35,8 @@ import {
 } from '@/components/ui/dialog';
 
 export const BillingPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canManageBilling = hasRole(['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -54,15 +57,17 @@ export const BillingPage: React.FC = () => {
     },
   ]);
 
-  // Auto-open modal on ?action=new
+  // Auto-open modal on ?action=new if permitted
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
-      setShowInvoiceModal(true);
+      if (canManageBilling) {
+        setShowInvoiceModal(true);
+      }
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('action');
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, canManageBilling]);
 
   // Payment Modal
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -185,10 +190,12 @@ export const BillingPage: React.FC = () => {
             Generate comprehensive hospital bills, record patient payments, and track revenue reconciliation.
           </p>
         </div>
-        <Button onClick={() => setShowInvoiceModal(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Create Invoice
-        </Button>
+        {canManageBilling && (
+          <Button onClick={() => setShowInvoiceModal(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Create Invoice
+          </Button>
+        )}
       </div>
 
       {/* Invoices Table Card */}
@@ -257,7 +264,7 @@ export const BillingPage: React.FC = () => {
                           <Printer className="w-3.5 h-3.5 text-primary" />
                           <span>Receipt</span>
                         </Button>
-                        {inv.status !== 'PAID' && (
+                        {canManageBilling && inv.status !== 'PAID' && (
                           <Button
                             size="sm"
                             className="h-7 text-xs"

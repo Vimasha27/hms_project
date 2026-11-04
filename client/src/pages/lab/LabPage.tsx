@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { LabRequest } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { FlaskConical, Plus, Droplet, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { PrintableLabReportModal } from '../../components/lab/PrintableLabReportModal';
@@ -34,6 +35,9 @@ import {
 } from '@/components/ui/dialog';
 
 export const LabPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canOrderLab = hasRole(['ADMIN', 'DOCTOR']);
+  const canProcessLab = hasRole(['ADMIN', 'LAB_STAFF']);
   const [requests, setRequests] = useState<LabRequest[]>([]);
   const [tests, setTests] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
@@ -153,10 +157,12 @@ export const LabPage: React.FC = () => {
             Process diagnostic specimen requests, record lab findings, and deliver verified reports.
           </p>
         </div>
-        <Button onClick={() => setShowOrderModal(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Order Lab Test
-        </Button>
+        {canOrderLab && (
+          <Button onClick={() => setShowOrderModal(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Order Lab Test
+          </Button>
+        )}
       </div>
 
       {/* Requests Table Card */}
@@ -225,7 +231,7 @@ export const LabPage: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {req.status === 'REQUESTED' && (
+                        {canProcessLab && req.status === 'REQUESTED' && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -237,7 +243,7 @@ export const LabPage: React.FC = () => {
                             <span>Collect Sample</span>
                           </Button>
                         )}
-                        {req.status !== 'COMPLETED' && (
+                        {canProcessLab && req.status !== 'COMPLETED' && (
                           <Button
                             size="sm"
                             className="h-7 text-xs"

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Medicine } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { Pill, AlertTriangle, Plus, CheckCircle, Package, Filter, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -39,6 +40,8 @@ import {
 } from '@/components/ui/dialog';
 
 export const PharmacyPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canManagePharmacy = hasRole(['ADMIN', 'PHARMACIST']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
@@ -83,14 +86,21 @@ export const PharmacyPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [medRes, rxRes, alertRes] = await Promise.all([
+      const promises: Promise<any>[] = [
         api.get('/pharmacy/medicines'),
-        api.get('/pharmacy/prescriptions'),
         api.get('/pharmacy/alerts'),
-      ]);
+      ];
+      if (canManagePharmacy) {
+        promises.push(api.get('/pharmacy/prescriptions'));
+      }
+      const results = await Promise.all(promises);
+      const medRes = results[0];
+      const alertRes = results[1];
+      const rxRes = canManagePharmacy ? results[2] : null;
+
       if (medRes.data.success) setMedicines(medRes.data.data);
-      if (rxRes.data.success) setPrescriptions(rxRes.data.data);
       if (alertRes.data.success) setAlerts(alertRes.data.data);
+      if (rxRes && rxRes.data.success) setPrescriptions(rxRes.data.data);
     } catch (e) {
       console.error(e);
     } finally {
@@ -150,10 +160,12 @@ export const PharmacyPage: React.FC = () => {
             Monitor drug batches, fulfill electronic prescriptions, and track expiry dates.
           </p>
         </div>
-        <Button onClick={() => setShowAddMed(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Add Medicine
-        </Button>
+        {canManagePharmacy && (
+          <Button onClick={() => setShowAddMed(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Add Medicine
+          </Button>
+        )}
       </div>
 
       {/* Expiry & Low Stock Warning Banners */}
@@ -185,16 +197,25 @@ export const PharmacyPage: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)}>
-        <TabsList className="grid w-full sm:w-[480px] grid-cols-2">
-          <TabsTrigger value="inventory" className="gap-2">
-            <Package className="w-4 h-4" />
-            Catalog & Stock ({medicines.length})
-          </TabsTrigger>
-          <TabsTrigger value="prescriptions" className="gap-2">
-            <CheckCircle className="w-4 h-4" />
-            Pending Dispensation ({prescriptions.length})
-          </TabsTrigger>
-        </TabsList>
+        {canManagePharmacy ? (
+          <TabsList className="grid w-full sm:w-[480px] grid-cols-2">
+            <TabsTrigger value="inventory" className="gap-2">
+              <Package className="w-4 h-4" />
+              Catalog & Stock ({medicines.length})
+            </TabsTrigger>
+            <TabsTrigger value="prescriptions" className="gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Pending Dispensation ({prescriptions.length})
+            </TabsTrigger>
+          </TabsList>
+        ) : (
+          <TabsList className="w-auto">
+            <TabsTrigger value="inventory" className="gap-2">
+              <Package className="w-4 h-4" />
+              Catalog & Stock ({medicines.length})
+            </TabsTrigger>
+          </TabsList>
+        )}
 
         {/* Tab 1: Inventory */}
         <TabsContent value="inventory" className="mt-4 space-y-3">
@@ -232,7 +253,7 @@ export const PharmacyPage: React.FC = () => {
                     <TableHead>Unit Price</TableHead>
                     <TableHead>Total Stock</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    {canManagePharmacy && <TableHead className="text-right">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,19 +280,21 @@ export const PharmacyPage: React.FC = () => {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs"
-                          onClick={() => {
-                            setSelectedMedId(m.id);
-                            setShowAddBatch(true);
-                          }}
-                        >
-                          + Add Batch
-                        </Button>
-                      </TableCell>
+                      {canManagePharmacy && (
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => {
+                              setSelectedMedId(m.id);
+                              setShowAddBatch(true);
+                            }}
+                          >
+                            + Add Batch
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -281,7 +304,8 @@ export const PharmacyPage: React.FC = () => {
         </TabsContent>
 
         {/* Tab 2: Prescriptions */}
-        <TabsContent value="prescriptions" className="space-y-4 mt-4">
+        {canManagePharmacy && (
+          <TabsContent value="prescriptions" className="space-y-4 mt-4">
           {prescriptions.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground text-sm">
@@ -326,7 +350,8 @@ export const PharmacyPage: React.FC = () => {
               </Card>
             ))
           )}
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Modal Add Medicine */}

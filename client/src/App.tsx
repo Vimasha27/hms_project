@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { PatientsPage } from './pages/patients/PatientsPage';
@@ -25,16 +26,86 @@ export const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route path="patients" element={<PatientsPage />} />
-            <Route path="patients/:id" element={<PatientDetailPage />} />
-            <Route path="appointments" element={<AppointmentsPage />} />
-            <Route path="emr" element={<EmrConsultationPage />} />
-            <Route path="pharmacy" element={<PharmacyPage />} />
-            <Route path="laboratory" element={<LabPage />} />
-            <Route path="inpatient" element={<InpatientPage />} />
-            <Route path="billing" element={<BillingPage />} />
-            <Route path="staff" element={<StaffPage />} />
-            <Route path="reports" element={<ReportsPage />} />
+            <Route
+              path="patients"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT']}>
+                  <PatientsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="patients/:id"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT']}>
+                  <PatientDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="appointments"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'RECEPTIONIST']}>
+                  <AppointmentsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="emr"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR']}>
+                  <EmrConsultationPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="pharmacy"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'PHARMACIST', 'DOCTOR']}>
+                  <PharmacyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="laboratory"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'LAB_STAFF', 'DOCTOR']}>
+                  <LabPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="inpatient"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST']}>
+                  <InpatientPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="billing"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST']}>
+                  <BillingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <StaffPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="reports"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'ACCOUNTANT', 'DOCTOR']}>
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

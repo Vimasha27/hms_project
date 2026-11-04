@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { Appointment, Doctor, Patient } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { Calendar, Clock, Plus, Filter, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,6 +35,8 @@ import {
 } from '@/components/ui/table';
 
 export const AppointmentsPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canManageAppointments = hasRole(['ADMIN', 'RECEPTIONIST', 'DOCTOR']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -43,15 +46,17 @@ export const AppointmentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Auto-open modal on ?action=new
+  // Auto-open modal on ?action=new if permitted
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
-      setShowModal(true);
+      if (canManageAppointments) {
+        setShowModal(true);
+      }
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('action');
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, canManageAppointments]);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleApt, setRescheduleApt] = useState<Appointment | null>(null);
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
@@ -162,10 +167,12 @@ export const AppointmentsPage: React.FC = () => {
             Schedule patient consultations, avoid slot collisions, and track daily appointment workflows.
           </p>
         </div>
-        <Button onClick={() => setShowModal(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Book Appointment
-        </Button>
+        {canManageAppointments && (
+          <Button onClick={() => setShowModal(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Book Appointment
+          </Button>
+        )}
       </div>
 
       {/* Filter Bar Card */}
@@ -224,7 +231,7 @@ export const AppointmentsPage: React.FC = () => {
                   <TableHead>Doctor</TableHead>
                   <TableHead>Reason / Notes</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {canManageAppointments && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -264,43 +271,45 @@ export const AppointmentsPage: React.FC = () => {
                         {apt.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right space-x-1.5">
-                      {apt.status !== 'COMPLETED' && apt.status !== 'CANCELLED' && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => {
-                              setRescheduleApt(apt);
-                              setNewDate(new Date(apt.appointmentDate).toISOString().split('T')[0]);
-                              setNewSlot(apt.timeSlot);
-                              setShowRescheduleModal(true);
-                            }}
-                          >
-                            Reschedule
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs gap-1"
-                            onClick={() => updateStatus(apt.id, 'COMPLETED')}
-                          >
-                            <CheckCircle2 className="w-3 h-3" />
-                            Done
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="h-7 text-xs gap-1"
-                            onClick={() => updateStatus(apt.id, 'CANCELLED')}
-                          >
-                            <XCircle className="w-3 h-3" />
-                            Cancel
-                          </Button>
-                        </>
-                      )}
-                    </TableCell>
+                    {canManageAppointments && (
+                      <TableCell className="text-right space-x-1.5">
+                        {apt.status !== 'COMPLETED' && apt.status !== 'CANCELLED' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => {
+                                setRescheduleApt(apt);
+                                setNewDate(new Date(apt.appointmentDate).toISOString().split('T')[0]);
+                                setNewSlot(apt.timeSlot);
+                                setShowRescheduleModal(true);
+                              }}
+                            >
+                              Reschedule
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs gap-1"
+                              onClick={() => updateStatus(apt.id, 'COMPLETED')}
+                            >
+                              <CheckCircle2 className="w-3 h-3" />
+                              Done
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-7 text-xs gap-1"
+                              onClick={() => updateStatus(apt.id, 'CANCELLED')}
+                            >
+                              <XCircle className="w-3 h-3" />
+                              Cancel
+                            </Button>
+                          </>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

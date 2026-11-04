@@ -97,6 +97,7 @@ export const DashboardPage: React.FC = () => {
       value: metrics?.todayAppointments || 0,
       icon: Calendar,
       link: '/appointments',
+      roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'],
     },
     {
       title: 'Active Admissions',
@@ -104,6 +105,7 @@ export const DashboardPage: React.FC = () => {
       value: metrics?.activeAdmissions || 0,
       icon: BedDouble,
       link: '/inpatient',
+      roles: ['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'],
     },
     {
       title: 'Pending Lab Tests',
@@ -111,10 +113,11 @@ export const DashboardPage: React.FC = () => {
       value: metrics?.pendingLabs || 0,
       icon: FlaskConical,
       link: '/laboratory',
+      roles: ['ADMIN', 'LAB_STAFF', 'DOCTOR'],
     },
   ];
 
-  const canAccessBilling = hasRole(['ADMIN', 'ACCOUNTANT', 'RECEPTIONIST']);
+  const canAccessBilling = hasRole(['ADMIN', 'ACCOUNTANT']);
 
   const formatDoctorName = (username?: string) => {
     if (!username) return 'Specialist';
@@ -175,27 +178,31 @@ export const DashboardPage: React.FC = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              asChild
-              size="sm"
-              className="gap-2 font-semibold bg-highlight text-foreground hover:bg-light-green shadow-xs"
-            >
-              <Link to="/patients?action=new">
-                <PlusCircle className="w-4 h-4" />
-                Register Patient
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="gap-2 bg-transparent border-surface/40 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
-            >
-              <Link to="/appointments?action=new">
-                <Calendar className="w-4 h-4" />
-                Book Appointment
-              </Link>
-            </Button>
+            {hasRole(['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE']) && (
+              <Button
+                asChild
+                size="sm"
+                className="gap-2 font-semibold bg-highlight text-foreground hover:bg-light-green shadow-xs"
+              >
+                <Link to="/patients?action=new">
+                  <PlusCircle className="w-4 h-4" />
+                  Register Patient
+                </Link>
+              </Button>
+            )}
+            {hasRole(['ADMIN', 'RECEPTIONIST', 'DOCTOR']) && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="gap-2 bg-transparent border-surface/40 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+              >
+                <Link to="/appointments?action=new">
+                  <Calendar className="w-4 h-4" />
+                  Book Appointment
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -228,48 +235,68 @@ export const DashboardPage: React.FC = () => {
               <div className="p-6 sm:p-8 flex flex-col justify-between gap-4 flex-1">
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <Banknote className="w-4 h-4 text-primary" />
-                    Total Revenue (Cumulative)
+                    <BedDouble className="w-4 h-4 text-primary" />
+                    Active Inpatient Occupancy
                   </span>
                 </div>
                 <div>
                   <p className="text-3xl sm:text-4xl font-bold font-mono tabular-nums tracking-tight text-foreground">
-                    Rs. {(metrics?.totalRevenue || 0).toLocaleString()}
+                    {metrics?.activeAdmissions || 0} Admitted
                   </p>
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    Cumulative settled hospital receipts
+                    Occupied inpatient clinical ward beds
                   </p>
                 </div>
               </div>
             )}
 
-            <Link
-              to="/patients"
-              className="group px-6 py-5 sm:px-8 flex items-center justify-between gap-4 hover:bg-muted/40 transition-colors"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="p-2.5 rounded-lg bg-muted text-foreground">
-                  <Users className="w-5 h-5" />
+            {hasRole(['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT']) ? (
+              <Link
+                to="/patients"
+                className="group px-6 py-5 sm:px-8 flex items-center justify-between gap-4 hover:bg-muted/40 transition-colors"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="p-2.5 rounded-lg bg-muted text-foreground">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Total Patients (Cumulative)</p>
+                    <p className="text-xs text-muted-foreground">Registered master index</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Total Patients (Cumulative)</p>
-                  <p className="text-xs text-muted-foreground">Registered master index</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold font-mono tabular-nums tracking-tight text-foreground">
+                    {metrics?.totalPatients || 0}
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
+            ) : (
+              <div className="px-6 py-5 sm:px-8 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-2.5 rounded-lg bg-muted text-foreground">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Total Patients (Cumulative)</p>
+                    <p className="text-xs text-muted-foreground">Registered master index</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl font-bold font-mono tabular-nums tracking-tight text-foreground">
+                    {metrics?.totalPatients || 0}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold font-mono tabular-nums tracking-tight text-foreground">
-                  {metrics?.totalPatients || 0}
-                </span>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
+            )}
           </div>
 
           {/* Center Column: Live Clinical Throughput Strip */}
           <div className="lg:col-span-4 divide-y divide-border flex flex-col justify-between">
             {clinicalFlowMetrics.map((item) => {
               const Icon = item.icon;
-              return (
+              const isAllowed = hasRole(item.roles);
+              return isAllowed ? (
                 <Link
                   key={item.link}
                   to={item.link}
@@ -293,55 +320,116 @@ export const DashboardPage: React.FC = () => {
                     <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </div>
                 </Link>
+              ) : (
+                <div
+                  key={item.title}
+                  className="px-6 py-4 sm:px-7 flex items-center justify-between gap-4 flex-1"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="p-2 rounded-lg bg-muted text-foreground shrink-0">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {item.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <span className="text-2xl font-bold font-mono tabular-nums tracking-tight text-foreground">
+                      {item.value}
+                    </span>
+                  </div>
+                </div>
               );
             })}
           </div>
 
           {/* Right Column: Pharmacy Triage & Low Stock Watch */}
-          <Link
-            to="/pharmacy?filter=low-stock"
-            className={`lg:col-span-3 group p-6 sm:p-8 flex flex-col justify-between gap-6 transition-colors ${
-              lowStockCount > 0
-                ? 'bg-destructive/5 hover:bg-destructive/10'
-                : 'hover:bg-muted/40'
-            }`}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div
-                className={`p-2.5 rounded-lg ${
-                  lowStockCount > 0
-                    ? 'bg-destructive/10 text-destructive'
-                    : 'bg-muted text-foreground'
-                }`}
-              >
-                <AlertTriangle className="w-5 h-5" />
+          {hasRole(['ADMIN', 'PHARMACIST', 'DOCTOR']) ? (
+            <Link
+              to="/pharmacy?filter=low-stock"
+              className={`lg:col-span-3 group p-6 sm:p-8 flex flex-col justify-between gap-6 transition-colors ${
+                lowStockCount > 0
+                  ? 'bg-destructive/5 hover:bg-destructive/10'
+                  : 'hover:bg-muted/40'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div
+                  className={`p-2.5 rounded-lg ${
+                    lowStockCount > 0
+                      ? 'bg-destructive/10 text-destructive'
+                      : 'bg-muted text-foreground'
+                  }`}
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <Badge variant={lowStockCount > 0 ? 'destructive' : 'secondary'}>
+                  {lowStockCount > 0 ? 'Action Needed' : 'Stock Healthy'}
+                </Badge>
               </div>
-              <Badge variant={lowStockCount > 0 ? 'destructive' : 'secondary'}>
-                {lowStockCount > 0 ? 'Action Needed' : 'Stock Healthy'}
-              </Badge>
-            </div>
 
-            <div>
-              <p
-                className={`text-4xl sm:text-5xl font-bold font-mono tabular-nums tracking-tight ${
-                  lowStockCount > 0 ? 'text-destructive' : 'text-foreground'
-                }`}
-              >
-                {lowStockCount}
-              </p>
-              <p className="text-sm font-semibold text-foreground mt-2">Low Stock Alerts</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {lowStockCount > 0
-                  ? 'Batches below reorder threshold'
-                  : 'All dispensary batches stocked'}
-              </p>
-            </div>
+              <div>
+                <p
+                  className={`text-4xl sm:text-5xl font-bold font-mono tabular-nums tracking-tight ${
+                    lowStockCount > 0 ? 'text-destructive' : 'text-foreground'
+                  }`}
+                >
+                  {lowStockCount}
+                </p>
+                <p className="text-sm font-semibold text-foreground mt-2">Low Stock Alerts</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {lowStockCount > 0
+                    ? 'Batches below reorder threshold'
+                    : 'All dispensary batches stocked'}
+                </p>
+              </div>
 
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-              <span>Inspect Inventory</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <span>Inspect Inventory</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          ) : (
+            <div
+              className={`lg:col-span-3 p-6 sm:p-8 flex flex-col justify-between gap-6 ${
+                lowStockCount > 0 ? 'bg-destructive/5' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div
+                  className={`p-2.5 rounded-lg ${
+                    lowStockCount > 0
+                      ? 'bg-destructive/10 text-destructive'
+                      : 'bg-muted text-foreground'
+                  }`}
+                >
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <Badge variant={lowStockCount > 0 ? 'destructive' : 'secondary'}>
+                  {lowStockCount > 0 ? 'Notice' : 'Stock Healthy'}
+                </Badge>
+              </div>
+
+              <div>
+                <p
+                  className={`text-4xl sm:text-5xl font-bold font-mono tabular-nums tracking-tight ${
+                    lowStockCount > 0 ? 'text-destructive' : 'text-foreground'
+                  }`}
+                >
+                  {lowStockCount}
+                </p>
+                <p className="text-sm font-semibold text-foreground mt-2">Pharmacy Status</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {lowStockCount > 0
+                    ? 'Batches below reorder threshold'
+                    : 'All dispensary batches stocked'}
+                </p>
+              </div>
             </div>
-          </Link>
+          )}
         </div>
       </Card>
 
@@ -356,19 +444,23 @@ export const DashboardPage: React.FC = () => {
               </CardTitle>
               <CardDescription>Latest consultation bookings across clinics</CardDescription>
             </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/appointments" className="text-xs text-primary font-medium">
-                View All
-              </Link>
-            </Button>
+            {hasRole(['ADMIN', 'DOCTOR', 'RECEPTIONIST']) && (
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/appointments" className="text-xs text-primary font-medium">
+                  View All
+                </Link>
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="pt-0">
             {!metrics?.recentAppointments || metrics.recentAppointments.length === 0 ? (
               <div className="py-8 text-center space-y-2">
                 <p className="text-sm text-muted-foreground">No recent appointments scheduled.</p>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/appointments?action=new">Book New Appointment</Link>
-                </Button>
+                {hasRole(['ADMIN', 'DOCTOR', 'RECEPTIONIST']) && (
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/appointments?action=new">Book New Appointment</Link>
+                  </Button>
+                )}
               </div>
             ) : (
               <Table>
@@ -384,12 +476,18 @@ export const DashboardPage: React.FC = () => {
                   {metrics.recentAppointments.map((apt: any) => (
                     <TableRow key={apt.id}>
                       <TableCell className="font-medium">
-                        <Link
-                          to={`/patients/${apt.patient.id}`}
-                          className="hover:underline text-foreground hover:text-primary transition-colors"
-                        >
-                          {apt.patient.firstName} {apt.patient.lastName}
-                        </Link>
+                        {hasRole(['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT']) ? (
+                          <Link
+                            to={`/patients/${apt.patient.id}`}
+                            className="hover:underline text-foreground hover:text-primary transition-colors"
+                          >
+                            {apt.patient.firstName} {apt.patient.lastName}
+                          </Link>
+                        ) : (
+                          <span className="text-foreground">
+                            {apt.patient.firstName} {apt.patient.lastName}
+                          </span>
+                        )}
                         <span className="block text-xs font-normal text-muted-foreground font-mono">
                           {apt.patient.patientCode}
                         </span>

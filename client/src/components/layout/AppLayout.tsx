@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export const AppLayout: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasRole } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -83,18 +83,20 @@ export const AppLayout: React.FC = () => {
           </div>
 
           {/* Global Patient Search Bar */}
-          <form onSubmit={handleQuickSearch} className="flex-1 max-w-md hidden md:block">
-            <div className="relative">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5" />
-              <Input
-                type="search"
-                value={quickSearch}
-                onChange={(e) => setQuickSearch(e.target.value)}
-                placeholder="Quick search patient MRN or name... (Enter)"
-                className="h-9 pl-9 text-xs bg-muted/40 border-border focus-visible:ring-primary"
-              />
-            </div>
-          </form>
+          {hasRole(['ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ACCOUNTANT']) && (
+            <form onSubmit={handleQuickSearch} className="flex-1 max-w-md hidden md:block">
+              <div className="relative">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5" />
+                <Input
+                  type="search"
+                  value={quickSearch}
+                  onChange={(e) => setQuickSearch(e.target.value)}
+                  placeholder="Quick search patient MRN or name... (Enter)"
+                  className="h-9 pl-9 text-xs bg-muted/40 border-border focus-visible:ring-primary"
+                />
+              </div>
+            </form>
+          )}
 
           {/* Right Header Controls */}
           <div className="flex items-center gap-3">

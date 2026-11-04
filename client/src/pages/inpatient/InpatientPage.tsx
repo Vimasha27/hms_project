@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Ward, Patient, Doctor } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { BedDouble } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -30,6 +31,9 @@ import {
 } from '@/components/ui/dialog';
 
 export const InpatientPage: React.FC = () => {
+  const { hasRole } = useAuth();
+  const canAdmit = hasRole(['ADMIN', 'DOCTOR', 'NURSE']);
+  const canDischarge = hasRole(['ADMIN', 'DOCTOR']);
   const [wards, setWards] = useState<Ward[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -191,26 +195,38 @@ export const InpatientPage: React.FC = () => {
 
                           <div>
                             {b.isOccupied && activeAdm ? (
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  setActiveAdmissionId(activeAdm.id);
-                                  setDischargeSummary('Patient recovered satisfactorily.');
-                                  setShowDischargeModal(true);
-                                }}
-                                className="w-full h-7 text-xs font-semibold"
-                              >
-                                Discharge
-                              </Button>
+                              canDischarge ? (
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    setActiveAdmissionId(activeAdm.id);
+                                    setDischargeSummary('Patient recovered satisfactorily.');
+                                    setShowDischargeModal(true);
+                                  }}
+                                  className="w-full h-7 text-xs font-semibold"
+                                >
+                                  Discharge
+                                </Button>
+                              ) : (
+                                <span className="block text-center text-[10px] text-muted-foreground italic py-1">
+                                  Occupied
+                                </span>
+                              )
                             ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => handleOpenAdmit(b)}
-                                className="w-full h-7 text-xs font-semibold"
-                              >
-                                Admit Patient
-                              </Button>
+                              canAdmit ? (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleOpenAdmit(b)}
+                                  className="w-full h-7 text-xs font-semibold"
+                                >
+                                  Admit Patient
+                                </Button>
+                              ) : (
+                                <span className="block text-center text-[10px] text-muted-foreground italic py-1">
+                                  Available
+                                </span>
+                              )
                             )}
                           </div>
                         </div>

@@ -29,9 +29,15 @@ app.use(
     crossOriginResourcePolicy: false,
   })
 );
+const allowedOrigins = config.corsOrigin
+  ? config.corsOrigin === '*'
+    ? true
+    : config.corsOrigin.split(',').map((o) => o.trim())
+  : ['http://localhost:5173'];
+
 app.use(
   cors({
-    origin: config.corsOrigin,
+    origin: allowedOrigins,
     credentials: true,
   })
 );
