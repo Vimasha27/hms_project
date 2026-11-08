@@ -32,8 +32,11 @@ app.use(
 const allowedOrigins = config.corsOrigin
   ? config.corsOrigin === '*'
     ? true
-    : config.corsOrigin.split(',').map((o) => o.trim())
-  : ['http://localhost:5173'];
+    : config.corsOrigin
+        .split(',')
+        .map((o) => o.trim().replace(/\/+$/, ''))
+        .filter(Boolean)
+  : ['http://localhost:5173', 'https://hms-project-orpin.vercel.app'];
 
 app.use(
   cors({

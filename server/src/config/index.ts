@@ -7,5 +7,5 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'super-secret-hms-jwt-key-2026',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173,https://hms-project-orpin.vercel.app',
 };
